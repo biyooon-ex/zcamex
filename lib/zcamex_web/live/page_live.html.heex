@@ -1,0 +1,67 @@
+<div class="flex flex-col md:flex-row justify-center items-center md:justify-between md:items-start">
+  <div>
+    <h1>Webcam</h1>
+    <video 
+      id="webcam-video" 
+      phx-hook="WebCam" 
+      data-fps={@selected_fps}
+      data-image-quality={@selected_image_quality}
+      width="320" 
+      height="240" 
+      muted
+      autoplay 
+      playsinline
+      style="transform: scaleX(-1);" />
+    <canvas id="webcam-capture-canvas" width="320" height="240" style="display: none;"></canvas>
+    <.form for={@form} phx-change="form_changed">
+      <.input
+        type="select"
+        label="Protocol"
+        field={@form[:protocol]}
+        options={@protocol_options}
+      />
+      <div>
+        <.input
+          type="range"
+          label="FPS"
+          min="1"
+          max="30"
+          step="1"
+          field={@form[:fps]}
+        />
+        <span><%= @selected_fps %></span>
+      </div>
+      <div>
+        <.input
+          type="range"
+          label="Image Quality"
+          min="0.0"
+          max="1.0"
+          step="0.1"
+          field={@form[:image_quality]}
+        />
+        <span><%= @selected_image_quality %></span>
+      </div>
+    </.form>
+  </div>
+  <div>
+    <h1>Mec</h1>
+    <canvas id="return-from-mec-canvas" width="320" height="240" style="transform: scaleX(-1);"></canvas>
+    <%= if @mec_error do %>
+      <p>Error: <span><%= @mec_error %></span></p>
+    <% else %>
+      <p>Latency: <span id="mec-latency"></span> ms</p>
+      <p>Data Size: <span id="mec-data-size"></span> bytes</p>
+    <% end %>
+  </div>
+  <div>
+    <h1>Cloud</h1>
+    <canvas id="return-from-cloud-canvas" width="320" height="240" style="transform: scaleX(-1);"></canvas>
+    <%= if @cloud_error do %>
+      <p>Error: <span><%= @cloud_error %></span></p>
+    <% else %>
+      <p>Latency: <span id="cloud-latency"></span> ms</p>
+      <p>Data Size: <span id="cloud-data-size"></span> bytes</p>
+    <% end %>
+  </div>
+</div>
