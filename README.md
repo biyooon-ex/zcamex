@@ -22,7 +22,7 @@ $ ./start.sh
 $ MEC_HTTP_BACKEND_URL="http://{your host}/echo" ./start.sh
 ```
 ブラウザから [`http://localhost:4000`](http://localhost:4000) にアクセスする。  
-別ホストからアクセスする場合は `https://{ip address of zcamex host}:4000` にアクセスする。
+別ホストからアクセスする場合は `https://{ip address of zcamex host}:4001` にアクセスする。
 
 ## 設定 (環境変数)
 | 項目 | 初期値 | 説明 |
