@@ -102,7 +102,6 @@ export default WebCam = {
     this.handleEvent("mec_returned", ({ returned_image: dataURL, latency }) => {
       returnedMecImage.src = dataURL;
       requestAnimationFrame(() => {
-        // returnFromMecContext.clearRect(0, 0, returnFromMecCanvas.width, returnFromMecCanvas.height);
         returnFromMecContext.drawImage(returnedMecImage, 0, 0, returnFromMecCanvas.width, returnFromMecCanvas.height);
         document.querySelector("#mec-latency").innerHTML = latency;
         document.querySelector("#mec-data-size").innerHTML = this.getImageSizeFromDataURL(dataURL);
@@ -113,7 +112,6 @@ export default WebCam = {
     this.handleEvent("cloud_returned", ({ returned_image: dataURL, latency }) => {
       returnedCloudImage.src = dataURL;
       requestAnimationFrame(() => {
-        // returnFromCloudContext.clearRect(0, 0, returnFromCloudCanvas.width, returnFromCloudCanvas.height);
         returnFromCloudContext.drawImage(returnedCloudImage, 0, 0, returnFromCloudCanvas.width, returnFromCloudCanvas.height);
         document.querySelector("#cloud-latency").innerHTML = latency;
         document.querySelector("#cloud-data-size").innerHTML = this.getImageSizeFromDataURL(dataURL);
