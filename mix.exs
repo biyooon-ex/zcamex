@@ -9,7 +9,8 @@ defmodule Zcamex.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      package: package()
     ]
   end
 
@@ -74,6 +75,12 @@ defmodule Zcamex.MixProject do
         "esbuild zcamex --minify",
         "phx.digest"
       ]
+    ]
+  end
+
+  defp package do
+    [
+      licenses: ["Apache-2.0"]
     ]
   end
 end
