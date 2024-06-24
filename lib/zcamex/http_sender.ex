@@ -1,8 +1,8 @@
 defmodule Zcamex.HTTPSender do
   @behaviour Zcamex.Sender
 
-  @default_mec_http_backend_url "http://localhost:4444/echo"
-  @default_cloud_http_backend_url "http://localhost:4444/echo"
+  @default_mec_backend "localhost"
+  @default_cloud_backend "localhost"
 
   @impl true
   def send(destination, payload) do
@@ -21,8 +21,9 @@ defmodule Zcamex.HTTPSender do
     end
   end
 
-  defp get_url(:mec), do: System.get_env("MEC_HTTP_BACKEND_URL", @default_mec_http_backend_url)
+  defp get_url(:mec),
+    do: "http://" <> System.get_env("MEC_BACKEND", @default_mec_backend) <> ":4444/echo"
 
   defp get_url(:cloud),
-    do: System.get_env("CLOUD_HTTP_BACKEND_URL", @default_cloud_http_backend_url)
+    do: "http://" <> System.get_env("CLOUD_BACKEND", @default_cloud_backend) <> ":4444/echo"
 end

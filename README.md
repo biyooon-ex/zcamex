@@ -21,8 +21,8 @@ mix setup
 # 全設定がデフォルト値の場合
 ./start.sh
 
-# 設定を変更する場合 (例: MEC_HTTP_BACKEND_URL を変更)
-MEC_HTTP_BACKEND_URL="http://{your host}/echo" ./start.sh
+# 設定を変更する場合 (例: MEC_BACKEND を変更)
+MEC_BACKEND="{your host}" ./start.sh
 ```
 
 ブラウザから [`http://localhost:4000`](http://localhost:4000) にアクセスする。  
@@ -32,5 +32,5 @@ MEC_HTTP_BACKEND_URL="http://{your host}/echo" ./start.sh
 
 | 項目 | 初期値 | 説明 |
 | --- | --- | --- |
-| MEC_HTTP_BACKEND_URL | "http://localhost:4444/echo" | MECの `HTTP Backend` のURL |
-| CLOUD_HTTP_BACKEND_URL | "http://localhost:4444/echo" | Cloudの `HTTP Backend` のURL |
+| MEC_BACKEND | "localhost" | MECの `Backend` のURLまたはIPアドレス |
+| CLOUD_BACKEND | "localhost" | Cloudの `Backend` のURLまたはIPアドレス |
