@@ -53,7 +53,13 @@ defmodule Zcamex.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
-      {:req, "~> 0.4.0"}
+      {:req, "~> 0.4.0"},
+      # {:zenohex, "~> 0.2.0"},
+      {:zenohex,
+       git: "https://github.com/biyooon-ex/zenohex",
+       branch: "bump_to_zenoh_v0.11.0",
+       override: true},
+      {:rustler, ">= 0.0.0", optional: true}
     ]
   end
 
