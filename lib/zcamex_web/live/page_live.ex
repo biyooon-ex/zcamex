@@ -1,11 +1,12 @@
 defmodule ZcamexWeb.PageLive do
   use ZcamexWeb, :live_view
-  alias Zcamex.{HTTPSender}
+  alias Zcamex.{HTTPSender, ZenohSender}
   require Logger
 
-  @protocol_options ["http"]
+  @protocol_options ["http", "zenoh"]
   @default_protocol "http"
-  @default_fps "10"
+  # @default_fps "10"
+  @default_fps "1"
   @default_image_quality "0.2"
 
   def mount(_params, _session, socket) do
@@ -127,4 +128,5 @@ defmodule ZcamexWeb.PageLive do
   defp assign_error(socket, :cloud, message), do: assign(socket, cloud_error: message)
 
   defp send("http", destination, payload), do: HTTPSender.send(destination, payload)
+  defp send("zenoh", destination, payload), do: ZenohSender.send(destination, payload)
 end
