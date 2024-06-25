@@ -4,11 +4,11 @@ defmodule Zcamex.ZenohSender do
   @default_mec_backend "localhost"
   @default_cloud_backend "localhost"
 
-  @ping_key "demo/zcam/ping"
-  @pong_key "demo/zcam/pong"
+  @prefix_ping_key "demo/zcam/ping/"
+  @prefix_pong_key "demo/zcam/pong/"
 
-  @impl true
-  def send(destination, payload) do
+  def create_zenoh_nodes(destination) do
+    # Set endpoint
     zrouter = get_zrouter(destination)
 
     config =
@@ -17,14 +17,25 @@ defmodule Zcamex.ZenohSender do
         scouting: %Zenohex.Config.Scouting{delay: 200}
       }
 
+    # Open session and declare publisher
     {:ok, session} = Zenohex.open(config)
-    {:ok, publisher} = Zenohex.Session.declare_publisher(session, @ping_key)
+    ping_key = @prefix_ping_key <> "#{destination}"
+    {:ok, publisher} = Zenohex.Session.declare_publisher(session, ping_key)
 
     # Declare subscriber with created Zenoh session
-    {:ok, subscriber} = Zenohex.Session.declare_subscriber(session, @pong_key)
+    pong_key = @prefix_pong_key <> "#{destination}"
+    {:ok, subscriber} = Zenohex.Session.declare_subscriber(session, pong_key)
 
+    %{:pub => publisher, :sub => subscriber}
+  end
+
+  @impl true
+  def send(destination, znodes, payload) do
+    publisher = znodes[destination] |> Map.get(:pub)
     image = payload |> Map.get("image")
     Zenohex.Publisher.put(publisher, image)
+
+    subscriber = znodes[destination] |> Map.get(:sub)
 
     case Zenohex.Subscriber.recv_timeout(subscriber, 1_000_000) do
       {:ok, sample} -> {:ok, %{"image" => sample.value}}
