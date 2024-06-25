@@ -5,7 +5,6 @@ defmodule ZcamexWeb.PageLive do
 
   @protocol_options ["http", "zenoh"]
   @default_protocol "http"
-  # @default_fps "10"
   @default_fps "10"
   @default_image_quality "0.2"
 
@@ -35,6 +34,9 @@ defmodule ZcamexWeb.PageLive do
 
   def handle_event("form_changed", params, socket) do
     %{"protocol" => protocol, "fps" => fps, "image_quality" => image_quality} = params
+
+    # Logging result
+    Logger.debug("RESULT: (form_changed) #{fps} #{image_quality}")
 
     {:noreply,
      socket
@@ -122,6 +124,8 @@ defmodule ZcamexWeb.PageLive do
     response = send(protocol, destination, znodes, payload)
     end_time = :os.system_time(:millisecond)
     latency = end_time - start_time
+    # Logging result
+    Logger.debug("RESULT: #{protocol} #{destination} #{byte_size(image)} #{latency}")
     handle_response(response, latency)
   end
 
