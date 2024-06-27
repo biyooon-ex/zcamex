@@ -4,5 +4,8 @@ defmodule Zcamex.Sender do
   @type image() :: String.t()
   @type message() :: String.t()
 
-  @callback send(destination(), payload()) :: {:ok, payload()} | {:error, message()}
+  @type pubsub() :: %{pub: String.t(), sub: String.t()}
+  @type znodes() :: %{mec: pubsub(), cloud: pubsub()}
+
+  @callback send(destination(), znodes(), payload()) :: {:ok, payload()} | {:error, message()}
 end
