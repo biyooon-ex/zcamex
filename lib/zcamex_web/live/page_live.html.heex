@@ -17,7 +17,7 @@
     <.form for={@form} phx-change="form_changed">
       <.input type="select" label="Protocol" field={@form[:protocol]} options={@protocol_options} />
       <div>
-        <.input type="range" label="FPS" min="1" max="30" step="1" field={@form[:fps]} />
+        <.input type="range" label="FPS" min="1" max="10" step="1" field={@form[:fps]} />
         <span><%= @selected_fps %></span>
       </div>
       <div>
