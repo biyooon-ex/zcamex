@@ -4,7 +4,7 @@ defmodule ZcamexWeb.PageLive do
   require Logger
 
   @protocol_options ["http", "zenoh"]
-  @default_protocol "http"
+  @default_protocol "zenoh"
   @default_fps "5"
   @default_image_quality "0.5"
 
