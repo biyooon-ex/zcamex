@@ -31,7 +31,8 @@ export default WebCam = {
     return setInterval(() => {
       if (webcamVideo.paused) return;
       const dataURL = webcamCaptureCanvas.toDataURL("image/jpeg", this.imageQuality);
-      this.pushEvent("send_image", { image: dataURL });
+      this.pushEvent("send_image_to_mec", { image: dataURL });
+      this.pushEvent("send_image_to_cloud", { image: dataURL });
     }, 1000 / this.fps);
   },
   mounted() {

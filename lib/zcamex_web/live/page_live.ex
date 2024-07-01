@@ -52,13 +52,21 @@ defmodule ZcamexWeb.PageLive do
      })}
   end
 
-  def handle_event("send_image", %{"image" => image}, socket) do
+  def handle_event("send_image_to_mec", %{"image" => image}, socket) do
     %{selected_protocol: selected_protocol} = socket.assigns
     %{znodes: znodes} = socket.assigns
 
     {:noreply,
      socket
-     |> start_async(:send_to_mec, fn -> handle_send(selected_protocol, :mec, znodes, image) end)
+     |> start_async(:send_to_mec, fn -> handle_send(selected_protocol, :mec, znodes, image) end)}
+  end
+
+  def handle_event("send_image_to_cloud", %{"image" => image}, socket) do
+    %{selected_protocol: selected_protocol} = socket.assigns
+    %{znodes: znodes} = socket.assigns
+
+    {:noreply,
+     socket
      |> start_async(:send_to_cloud, fn ->
        handle_send(selected_protocol, :cloud, znodes, image)
      end)}
