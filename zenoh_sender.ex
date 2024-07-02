@@ -30,26 +30,19 @@ defmodule Zcamex.ZenohSender do
   end
 
   @impl true
-  def send(destination, znodes, _mtopics, payload) do
+  def send(destination, znodes, payload) do
     publisher = znodes[destination] |> Map.get(:pub)
     image = payload |> Map.get("image")
     Zenohex.Publisher.put(publisher, image)
 
     subscriber = znodes[destination] |> Map.get(:sub)
-
-    case subscribe(subscriber) do
-      {:ok, image} -> {:ok, image}
-      {:error, :timeout} -> {:error, "Zecho timeout"}
-    end
+    subscribe(subscriber)
   end
 
   defp subscribe(subscriber) do
     case Zenohex.Subscriber.recv_timeout(subscriber) do
-      {:error, :timeout} ->
-        subscribe(subscriber)
-
-      {:ok, sample} ->
-        {:ok, %{"image" => sample.value}}
+      {:error, :timeout} -> subscribe(subscriber)
+      {:ok, sample} -> {:ok, %{"image" => sample.value}}
     end
   end
 

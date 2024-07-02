@@ -5,7 +5,7 @@ defmodule Zcamex.HTTPSender do
   @default_cloud_backend "localhost"
 
   @impl true
-  def send(destination, _znodes, payload) do
+  def send(destination, _znodes, _mtopics, payload) do
     url = get_url(destination)
     response = Req.post(url, json: Jason.encode!(payload))
 
