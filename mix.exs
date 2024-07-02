@@ -55,7 +55,8 @@ defmodule Zcamex.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
       {:req, "~> 0.4.0"},
-      {:zenohex, "~> 0.3.0"}
+      {:zenohex, "~> 0.3.0"},
+      {:tortoise311, "~> 0.11"}
     ]
   end
 
