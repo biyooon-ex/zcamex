@@ -3,7 +3,7 @@ defmodule ZcamexWeb.PageLive do
   alias Zcamex.{HTTPSender, ZenohSender}
   require Logger
 
-  @protocol_options ["http", "zenoh"]
+  @protocol_options ["zenoh", "http"]
   @default_protocol "zenoh"
   @default_fps "2"
   @default_image_quality "0.2"
@@ -52,78 +52,37 @@ defmodule ZcamexWeb.PageLive do
      })}
   end
 
-  def handle_event("send_image_to_mec", %{"image" => image}, socket) do
+  def handle_event("send_image", %{"image" => image}, socket) do
     %{selected_protocol: selected_protocol} = socket.assigns
     %{znodes: znodes} = socket.assigns
 
-    {:noreply,
-     socket
-     |> start_async(:send_to_mec, fn -> handle_send(selected_protocol, :mec, znodes, image) end)}
+    %{mec: mec_result, cloud: cloud_result} = handle_send(selected_protocol, znodes, image)
+
+    socket = handle_result(mec_result, :mec, socket)
+    socket = handle_result(cloud_result, :cloud, socket)
+
+    {:noreply, socket}
   end
 
-  def handle_event("send_image_to_cloud", %{"image" => image}, socket) do
-    %{selected_protocol: selected_protocol} = socket.assigns
-    %{znodes: znodes} = socket.assigns
-
-    {:noreply,
-     socket
-     |> start_async(:send_to_cloud, fn ->
-       handle_send(selected_protocol, :cloud, znodes, image)
-     end)}
+  defp handle_result({:ok, result}, destination, socket) do
+    socket
+    |> assign_error(destination, nil)
+    |> push_event("#{destination}_returned", result)
   end
 
-  def handle_async(:send_to_mec, {:ok, {:ok, result}}, socket) do
-    {:noreply,
-     socket
-     |> assign_error(:mec, nil)
-     |> push_event("mec_returned", result)}
+  defp handle_result({:error, message}, destination, socket) do
+    socket
+    |> assign_error(destination, message)
+    |> push_event("#{destination}_returned", %{
+      returned_image: nil,
+      latency: nil
+    })
   end
 
-  def handle_async(:send_to_mec, {:ok, {:error, message}}, socket) do
-    {:noreply,
-     socket
-     |> assign_error(:mec, message)
-     |> push_event("mec_returned", %{
-       returned_image: nil,
-       latency: nil
-     })}
-  end
-
-  def handle_async(:send_to_mec, {:exit, {exception, _stacktrace}}, socket) do
-    {:noreply,
-     socket
-     |> assign_error(:mec, Exception.message(exception))
-     |> push_event("mec_returned", %{
-       returned_image: nil,
-       latency: nil
-     })}
-  end
-
-  def handle_async(:send_to_cloud, {:ok, {:ok, result}}, socket) do
-    {:noreply,
-     socket
-     |> assign_error(:cloud, nil)
-     |> push_event("cloud_returned", result)}
-  end
-
-  def handle_async(:send_to_cloud, {:ok, {:error, message}}, socket) do
-    {:noreply,
-     socket
-     |> assign_error(:cloud, message)
-     |> push_event("cloud_returned", %{
-       returned_image: nil,
-       latency: nil
-     })}
-  end
-
-  def handle_async(:send_to_cloud, {:exit, {exception, _stacktrace}}, socket) do
-    {:noreply,
-     socket
-     |> assign_error(:cloud, Exception.message(exception))
-     |> push_event("cloud_returned", %{
-       returned_image: nil,
-       latency: nil
-     })}
+  defp handle_send(protocol, znodes, image) do
+    mec_result = handle_send(protocol, :mec, znodes, image)
+    cloud_result = handle_send(protocol, :cloud, znodes, image)
+    %{mec: mec_result, cloud: cloud_result}
   end
 
   defp handle_send(protocol, destination, znodes, image) do
