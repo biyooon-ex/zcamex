@@ -5,8 +5,8 @@ defmodule ZcamexWeb.PageLive do
 
   @protocol_options ["http", "zenoh"]
   @default_protocol "zenoh"
-  @default_fps "5"
-  @default_image_quality "0.5"
+  @default_fps "2"
+  @default_image_quality "0.2"
 
   def mount(_params, _session, socket) do
     znodes = %{
