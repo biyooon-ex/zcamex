@@ -3,9 +3,9 @@ defmodule ZcamexWeb.PageLive do
   alias Zcamex.{HTTPSender, ZenohSender}
   require Logger
 
-  @protocol_options ["http", "zenoh"]
+  @protocol_options ["zenoh", "http"]
   @default_protocol "zenoh"
-  @default_fps "2"
+  @default_fps "1"
   @default_image_quality "0.2"
 
   def mount(_params, _session, socket) do
