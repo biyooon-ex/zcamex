@@ -1,9 +1,9 @@
 defmodule ZcamexWeb.PageLive do
   use ZcamexWeb, :live_view
-  alias Zcamex.{HTTPSender, ZenohSender}
+  alias Zcamex.{ZenohSender, MQTTSender, HTTPSender}
   require Logger
 
-  @protocol_options ["http", "zenoh"]
+  @protocol_options ["zenoh", "mqtt", "http"]
   @default_protocol "zenoh"
   @default_fps "5"
   @default_image_quality "0.5"
@@ -14,6 +14,8 @@ defmodule ZcamexWeb.PageLive do
       :cloud => ZenohSender.create_zenoh_nodes(:cloud)
     }
 
+    {:ok, mtopics} = MQTTSender.create_mqtt_topics()
+
     {:ok,
      assign(socket,
        protocol_options: @protocol_options,
@@ -23,6 +25,7 @@ defmodule ZcamexWeb.PageLive do
        mec_error: nil,
        cloud_error: nil,
        znodes: znodes,
+       mtopics: mtopics,
        form:
          to_form(%{
            "protocol" => @default_protocol,
@@ -55,20 +58,24 @@ defmodule ZcamexWeb.PageLive do
   def handle_event("send_image_to_mec", %{"image" => image}, socket) do
     %{selected_protocol: selected_protocol} = socket.assigns
     %{znodes: znodes} = socket.assigns
+    %{mtopics: mtopics} = socket.assigns
 
     {:noreply,
      socket
-     |> start_async(:send_to_mec, fn -> handle_send(selected_protocol, :mec, znodes, image) end)}
+     |> start_async(:send_to_mec, fn ->
+       handle_send(selected_protocol, :mec, znodes, mtopics, image)
+     end)}
   end
 
   def handle_event("send_image_to_cloud", %{"image" => image}, socket) do
     %{selected_protocol: selected_protocol} = socket.assigns
     %{znodes: znodes} = socket.assigns
+    %{mtopics: mtopics} = socket.assigns
 
     {:noreply,
      socket
      |> start_async(:send_to_cloud, fn ->
-       handle_send(selected_protocol, :cloud, znodes, image)
+       handle_send(selected_protocol, :cloud, znodes, mtopics, image)
      end)}
   end
 
@@ -126,10 +133,10 @@ defmodule ZcamexWeb.PageLive do
      })}
   end
 
-  defp handle_send(protocol, destination, znodes, image) do
+  defp handle_send(protocol, destination, znodes, mtopics, image) do
     start_time = :os.system_time(:millisecond)
     payload = %{"image" => image}
-    response = send(protocol, destination, znodes, payload)
+    response = send(protocol, destination, znodes, mtopics, payload)
     end_time = :os.system_time(:millisecond)
     latency = end_time - start_time
     # Logging result
@@ -148,9 +155,12 @@ defmodule ZcamexWeb.PageLive do
   defp assign_error(socket, :mec, message), do: assign(socket, mec_error: message)
   defp assign_error(socket, :cloud, message), do: assign(socket, cloud_error: message)
 
-  defp send("http", destination, znodes, payload),
-    do: HTTPSender.send(destination, znodes, payload)
+  defp send("zenoh", destination, znodes, mtopics, payload),
+    do: ZenohSender.send(destination, znodes, mtopics, payload)
 
-  defp send("zenoh", destination, znodes, payload),
-    do: ZenohSender.send(destination, znodes, payload)
+  defp send("mqtt", destination, znodes, mtopics, payload),
+    do: MQTTSender.send(destination, znodes, mtopics, payload)
+
+  defp send("http", destination, znodes, mtopics, payload),
+    do: HTTPSender.send(destination, znodes, mtopics, payload)
 end
