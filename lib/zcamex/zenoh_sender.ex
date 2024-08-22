@@ -37,9 +37,19 @@ defmodule Zcamex.ZenohSender do
 
     subscriber = znodes[destination] |> Map.get(:sub)
 
-    case Zenohex.Subscriber.recv_timeout(subscriber, 1_000_000) do
-      {:ok, sample} -> {:ok, %{"image" => sample.value}}
+    case subscribe(subscriber) do
+      {:ok, image} -> {:ok, image}
       {:error, :timeout} -> {:error, "Zecho timeout"}
+    end
+  end
+
+  defp subscribe(subscriber) do
+    case Zenohex.Subscriber.recv_timeout(subscriber) do
+      {:error, :timeout} ->
+        subscribe(subscriber)
+
+      {:ok, sample} ->
+        {:ok, %{"image" => sample.value}}
     end
   end
 

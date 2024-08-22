@@ -3,9 +3,9 @@ defmodule ZcamexWeb.PageLive do
   alias Zcamex.{HTTPSender, ZenohSender}
   require Logger
 
-  @protocol_options ["http", "zenoh"]
-  @default_protocol "http"
-  @default_fps "10"
+  @protocol_options ["zenoh", "http"]
+  @default_protocol "zenoh"
+  @default_fps "1"
   @default_image_quality "0.2"
 
   def mount(_params, _session, socket) do
@@ -52,13 +52,21 @@ defmodule ZcamexWeb.PageLive do
      })}
   end
 
-  def handle_event("send_image", %{"image" => image}, socket) do
+  def handle_event("send_image_to_mec", %{"image" => image}, socket) do
     %{selected_protocol: selected_protocol} = socket.assigns
     %{znodes: znodes} = socket.assigns
 
     {:noreply,
      socket
-     |> start_async(:send_to_mec, fn -> handle_send(selected_protocol, :mec, znodes, image) end)
+     |> start_async(:send_to_mec, fn -> handle_send(selected_protocol, :mec, znodes, image) end)}
+  end
+
+  def handle_event("send_image_to_cloud", %{"image" => image}, socket) do
+    %{selected_protocol: selected_protocol} = socket.assigns
+    %{znodes: znodes} = socket.assigns
+
+    {:noreply,
+     socket
      |> start_async(:send_to_cloud, fn ->
        handle_send(selected_protocol, :cloud, znodes, image)
      end)}
